@@ -62,3 +62,60 @@ Adding the optimization flag -O1, -O2, or -O3 you can force the compiler to opti
 // for the previous code in tips 2.
 //you have to add flag: -ltbb
 g++ parallel_computation.cpp --std=c++2a -ltbb -O3 -o pcomp
+
+```
+
+### 4. Parallel Computation. [Atomic operations](https://en.cppreference.com/w/cpp/atomic/atomic)
+
+Atomic operations play a significant role when our application uses threads and threads access the same part of memory.
+Threads are not synchronized and can access the same location of memory at the same time. For instance, we can imagine, that two threads want to update a certain part of memory (value += 1). It can happen that at the same time one thread will write the value but the other read it (both threads operate on the same memory).
+The atomic operation solves the problem, where (+=) — read/write operation or other ([link](https://en.cppreference.com/w/cpp/atomic/atomic)) is considered as a single operation. The application reads and writes as one instruction.
+
+
+```cpp
+int M; 
+
+Eigen::Matrix<int, 3, 1> M_1 = Eigen::Matrix<int, 3, 1>::Ones();
+
+auto work = []()
+{
+    for (auto ii = 0; ii < 10; ii++) // 10-OK //100-NO
+    {
+        M += M_1.dot(M_1);
+    }
+};
+
+```
+
+In this atomic example, the result is always 6000.
+
+```cpp
+std::atomic<int> M; //only one diffrence
+
+Eigen::Matrix<int, 3, 1> M_1 = Eigen::Matrix<int, 3, 1>::Ones();
+
+auto work = []()
+{
+    for (auto ii = 0; ii < 10; ii++) // 10-OK //100-NO
+    {
+        M += M_1.dot(M_1);
+    }
+};
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
