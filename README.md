@@ -178,3 +178,252 @@ Dynamic:
 
 
 
+### 5. Lambda Function
+
+
+
+
+#### Capture by Value
+
+
+```cpp
+#include <iostream>
+
+int main() {
+    int x = 10;
+    auto print_x = [x]() {
+        std::cout << "x = " << x << std::endl;
+    };
+
+    x = 20;
+    print_x(); // Outputs: x = 10
+
+    return 0;
+}
+```
+
+#### Capture by Reference
+
+
+
+```cpp
+#include <iostream>
+
+int main() {
+    int x = 10;
+    auto increment_x = [&x]() {
+        x++;
+    };
+
+    increment_x();
+    std::cout << "x = " << x << std::endl; // Outputs: x = 11
+
+    return 0;
+}
+```
+
+#### Capture All Variables
+
+- **By Value (`[=]`)**: Captures all variables in scope by value.
+
+  ```cpp
+  auto lambda = [=]() { /* ... */ };
+  ```
+
+- **By Reference (`[&]`)**: Captures all variables in scope by reference.
+
+  ```cpp
+  auto lambda = [&]() { /* ... */ };
+  ```
+
+**Example:**
+
+```cpp
+#include <iostream>
+
+int main() {
+    int a = 5, b = 10;
+
+    auto capture_all_by_value = [=]() {
+        std::cout << "a = " << a << ", b = " << b << std::endl;
+    };
+
+    auto capture_all_by_reference = [&]() {
+        a++;
+        b++;
+    };
+
+    capture_all_by_value();        // Outputs: a = 5, b = 10
+    capture_all_by_reference();
+    capture_all_by_value();        // Outputs: a = 6, b = 11
+
+    return 0;
+}
+```
+
+
+### Mutable Lambdas
+
+By default, lambdas that capture variables by value cannot modify them. To allow modification, use the `mutable` keyword.
+
+```cpp
+#include <iostream>
+
+int main() {
+    int x = 10;
+    auto modify_x = [x]() mutable {
+        x++;
+        std::cout << "Inside lambda, x = " << x << std::endl;
+    };
+
+    modify_x(); // Outputs: Inside lambda, x = 11
+    std::cout << "Outside lambda, x = " << x << std::endl; // Outputs: x = 10
+
+    return 0;
+}
+```
+
+
+### Specifying Return Types
+
+
+```cpp
+#include <iostream>
+
+int main() {
+    auto divide = [](int a, int b) -> double {
+        return static_cast<double>(a) / b;
+    };
+
+    std::cout << "Result: " << divide(5, 2) << std::endl; // Outputs: Result: 2.5
+
+    return 0;
+}
+```
+
+---
+
+### Generic Lambdas (from C++14)
+
+```cpp
+#include <iostream>
+
+int main() {
+    auto add = [](auto a, auto b) {
+        return a + b;
+    };
+
+    std::cout << add(3, 4) << std::endl;       // Outputs: 7
+    std::cout << add(2.5, 3.5) << std::endl;   // Outputs: 6.0
+
+    return 0;
+}
+```
+
+### Using Lambdas with Standard Algorithms
+
+#### Sorting
+
+```cpp
+#include <algorithm>
+#include <vector>
+#include <iostream>
+
+int main() {
+    std::vector<int> data = {5, 2, 9, 1, 5, 6};
+
+    // Sort in ascending order
+    std::sort(data.begin(), data.end());
+
+    // Sort in descending order using a lambda
+    std::sort(data.begin(), data.end(), [](int a, int b) {
+        return a > b;
+    });
+
+    for (int n : data) {
+        std::cout << n << ' ';
+    }
+    // Outputs: 9 6 5 5 2 1
+
+    return 0;
+}
+```
+
+#### Filtering
+
+```cpp
+#include <algorithm>
+#include <vector>
+#include <iostream>
+
+int main() {
+    std::vector<int> data = {1, 2, 3, 4, 5, 6};
+
+    data.erase(
+        std::remove_if(data.begin(), data.end(), [](int x) {
+            return x % 2 == 0; // Remove even numbers
+        }),
+        data.end()
+    );
+
+    for (int n : data) {
+        std::cout << n << ' ';
+    }
+    // Outputs: 1 3 5
+
+    return 0;
+}
+```
+
+#### Transforming
+
+```cpp
+#include <algorithm>
+#include <vector>
+#include <iostream>
+
+int main() {
+    std::vector<int> data = {1, 2, 3};
+
+    std::transform(data.begin(), data.end(), data.begin(), [](int x) {
+        return x * x; // Square each element
+    });
+
+    for (int n : data) {
+        std::cout << n << ' ';
+    }
+    // Outputs: 1 4 9
+
+    return 0;
+}
+```
+
+
+
+### Lambdas and Multithreading
+
+Lambdas can be passed to thread constructors for concise thread functions.
+
+```cpp
+#include <thread>
+#include <iostream>
+
+int main() {
+    std::thread worker([]() {
+        std::cout << "Worker thread is running" << std::endl;
+    });
+
+    worker.join();
+
+    return 0;
+}
+```
+
+
+
+
+
+
+
+
+
